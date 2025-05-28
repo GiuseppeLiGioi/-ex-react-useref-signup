@@ -11,7 +11,7 @@ Gli input controllati devono tornare ai valori iniziali.
 Gli input non controllati devono essere resettati manualmente usando useRef().
 Freccia fissa in basso a destra che, quando cliccata, riporta l'utente all'inizio del form (bisogna usare position: fixed).
 */
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 
 const letters = "abcdefghijklmnopqrstuvwxyz";
 const numbers = "0123456789";
@@ -25,6 +25,7 @@ function App() {
  const anniRef = useRef()
  const specRef = useRef()
  const nameRef = useRef()
+ const formRef = useRef()
 
   const isUserValid = useMemo(() => {
    const charsValid = username.split("").every((c) => letters.includes(c.toLowerCase()) || numbers.includes(c.toLowerCase()) )
@@ -63,11 +64,29 @@ function App() {
  console.log(nameRef.current.value, username, password, anniRef.current.value, specRef.current.value, descr);
  }
 
+ useEffect(() => {
+ nameRef.current.focus()
+ }, [])
+
+ const handleReset = () => {
+  nameRef.current.value = "";
+  specRef.current.value = "";
+  anniRef.current.value = "";
+  setDescr("")
+  setPassword("")
+  setUsername("")
+  nameRef.current.focus() //metto anche qua il focus, così al reset rimette il focus sul name.
+ }
+
+ const scrollToView = () => {
+ formRef.current.scrollIntoView({behavior: "smooth"})
+ }
+
 
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} ref={formRef}>
          <label className='label'>Nome:</label>
          <input className='input' type='text' placeholder='inserisci il tuo nome' ref={nameRef}/>
 
@@ -100,6 +119,8 @@ function App() {
           )}
 
           <button type='submit'>Invia</button>
+          <button onClick={handleReset}>Reset</button>
+          <button onClick={scrollToView} className='scrollTopBtn '>↑</button>
       </form>
     </>
   )
