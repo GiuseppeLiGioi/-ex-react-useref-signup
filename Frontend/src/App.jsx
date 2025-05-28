@@ -2,33 +2,27 @@
   💡Premessa: Stai sviluppando un form di registrazione per una piattaforma dedicata ai giovani sviluppatori web. 
   Gli utenti devono iscriversi indicando le loro competenze e specializzazioni.
 
-  📌 Milestone 2: Validare in tempo reale
-Aggiungere la validazione in tempo reale dei seguenti campi:
+  📌 Milestone 3: Convertire i Campi Non Controllati
+Non tutti i campi del form necessitano di essere aggiornati a ogni carattere digitato. Alcuni di essi non influenzano direttamente l’interfaccia mentre l’utente li compila, quindi è possibile gestirli in modo più efficiente.
 
-✅ Username:  Deve contenere solo caratteri alfanumerici e almeno 6 caratteri (no spazi o simboli).
-
-✅ Password: Deve contenere almeno 8 caratteri, 1 lettera, 1 numero e 1 simbolo.
-
-✅ Descrizione: Deve contenere tra 100 e 1000 caratteri (senza spazi iniziali e finali).
-
-Suggerimento: Per semplificare la validazione, puoi definire tre stringhe con i caratteri validi e usare .includes() per controllare se i caratteri appartengono a una di queste categorie:
-
-
-Per ciascuno dei campi validati in tempo reale, mostrare un messaggio di errore (rosso) nel caso non siano validi, oppure un messaggio di conferma (verde) nel caso siano validi.
+Analizza il form: Identifica quali campi devono rimanere controllati e quali invece possono essere non controllati senza impattare l’esperienza utente.
+Converti i campi non controllati: Usa useRef() per gestirli e recuperare il loro valore solo al momento del submit.
+Assicurati che la validazione continui a funzionare: Anche se un campo non è controllato, deve comunque essere validato correttamente quando l’utente invia il form.
 */
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 
 const letters = "abcdefghijklmnopqrstuvwxyz";
 const numbers = "0123456789";
 const symbols = "!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~";
 
 function App() {
- const [name, setName] = useState("");
+
  const [username, setUsername] = useState("");
  const [password, setPassword] = useState("");
- const [specializzazione, setSpecializzazione] = useState("")
- const [anni, setAnni] = useState("")
  const [descr, setDescr] = useState("")
+ const anniRef = useRef()
+ const specRef = useRef()
+ const nameRef = useRef()
 
   const isUserValid = useMemo(() => {
    const charsValid = username.split("").every((c) => letters.includes(c.toLowerCase()) || numbers.includes(c.toLowerCase()) )
@@ -57,14 +51,14 @@ function App() {
 
  const handleSubmit = (e) => {
  e.preventDefault()
- if(name === "" || username === "" || password === "" || specializzazione === "" || anni === "" || descr === "" ){
+ if(nameRef.current === "" || username === "" || password === "" || specRef.current === "" || anniRef.current === "" || descr === "" ){
   console.log("Devi compilare tutti i campi");
   return;
- }else if(parseInt(anni) < 1){
+ }else if(parseInt(anniRef.current) < 1){
   console.log("Gli anni di esperienza deve essere un numero positivo")
   return;
  }
- console.log(name, username, password, specializzazione, anni, descr);
+ console.log(nameRef.current.value, username, password, anniRef.current.value, specRef.current.value, descr);
  }
 
 
@@ -73,7 +67,7 @@ function App() {
     <>
       <form onSubmit={handleSubmit}>
          <label className='label'>Nome:</label>
-         <input className='input' type='text' placeholder='inserisci il tuo nome' onChange={(e) => setName(e.target.value)} value={name}/>
+         <input className='input' type='text' placeholder='inserisci il tuo nome' ref={nameRef}/>
 
          <label className='label'>UserName:</label>
          <input className='input' type='text' placeholder='inserisci il tuo User' onChange={(e) => setUsername(e.target.value)} value={username}/>
@@ -87,7 +81,7 @@ function App() {
           )}
 
          <label className='label'>Specializzazione:</label>
-         <select className='input' value={specializzazione} onChange={(e) => setSpecializzazione(e.target.value)}>
+         <select className='input' ref={specRef}>
           <option value="">-- Scegli una Specializzazione --</option>
           <option value="Full Stack">Full Stack</option>
           <option value="Frontend">Frontend</option>
@@ -95,7 +89,7 @@ function App() {
          </select>
 
           <label className='label'>Anni di esperienza:</label>
-         <input className='input' type='number' placeholder='inserisci gli anni di esperienza' onChange={(e) => setAnni(e.target.value)} value={anni}/>
+         <input className='input' type='number' placeholder='inserisci gli anni di esperienza' ref={anniRef}/>
 
           <label className='label'>Descrizione:</label>
          <textarea className='input' placeholder='inserisci una breve descrizione' onChange={(e) => setDescr(e.target.value)} value={descr}/>
