@@ -2,30 +2,25 @@
   💡Premessa: Stai sviluppando un form di registrazione per una piattaforma dedicata ai giovani sviluppatori web. 
   Gli utenti devono iscriversi indicando le loro competenze e specializzazioni.
 
-  📌 Milestone 1: Creare un Form con Campi Controllati
-Crea un form di registrazione con i seguenti campi controllati (gestiti con useState):
+  📌 Milestone 2: Validare in tempo reale
+Aggiungere la validazione in tempo reale dei seguenti campi:
 
-✅ Nome completo (input di testo)
+✅ Username:  Deve contenere solo caratteri alfanumerici e almeno 6 caratteri (no spazi o simboli).
 
-✅ Username (input di testo)
+✅ Password: Deve contenere almeno 8 caratteri, 1 lettera, 1 numero e 1 simbolo.
 
-✅ Password (input di tipo password)
+✅ Descrizione: Deve contenere tra 100 e 1000 caratteri (senza spazi iniziali e finali).
 
-✅ Specializzazione (select con opzioni: "Full Stack", "Frontend", "Backend")
+Suggerimento: Per semplificare la validazione, puoi definire tre stringhe con i caratteri validi e usare .includes() per controllare se i caratteri appartengono a una di queste categorie:
 
-✅ Anni di esperienza (input di tipo number)
 
-✅ Breve descrizione sullo sviluppatore (textarea)
-
-Aggiungi una validazione al submit, verificando che:
-
-Tutti i campi siano compilati
-L'input Anni di esperienza sia un numero positivo
-La Specializzazione sia selezionata
-
-Al submit, se il form è valido, stampa in console i dati.
+Per ciascuno dei campi validati in tempo reale, mostrare un messaggio di errore (rosso) nel caso non siano validi, oppure un messaggio di conferma (verde) nel caso siano validi.
 */
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+
+const letters = "abcdefghijklmnopqrstuvwxyz";
+const numbers = "0123456789";
+const symbols = "!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~";
 
 function App() {
  const [name, setName] = useState("");
@@ -34,6 +29,30 @@ function App() {
  const [specializzazione, setSpecializzazione] = useState("")
  const [anni, setAnni] = useState("")
  const [descr, setDescr] = useState("")
+
+  const isUserValid = useMemo(() => {
+   const charsValid = username.split("").every((c) => letters.includes(c.toLowerCase()) || numbers.includes(c.toLowerCase()) )
+   return charsValid && username.trim().length >= 6;  
+  }, [username])
+
+  const isPasswordValid = useMemo(() => {
+   /*Password: Deve contenere almeno 8 caratteri, 1 lettera, 1 numero e 1 simbolo.*/
+   return (
+      password.trim().length >= 8 &&
+      password.split("").some((p) => letters.includes(p.toLowerCase())) &&
+      password.split("").some((p) => numbers.includes(p.toLowerCase())) &&
+      password.split("").some((p) => symbols.includes(p.toLowerCase()))
+    )
+       
+   
+  }, [password])
+
+
+    const isDescrValid = useMemo(() => {
+   /*Descrizione: Deve contenere tra 100 e 1000 caratteri (senza spazi iniziali e finali).*/
+   return descr.trim().length >= 100 && descr.trim().length <= 1000
+   
+  }, [descr])
 
 
  const handleSubmit = (e) => {
@@ -58,9 +77,14 @@ function App() {
 
          <label className='label'>UserName:</label>
          <input className='input' type='text' placeholder='inserisci il tuo User' onChange={(e) => setUsername(e.target.value)} value={username}/>
-
+          {username && (
+            <p className={isUserValid ? 'valid' : 'error'}>{isUserValid ? "User ok"  : "Deve contenere solo caratteri alfanumerici e almeno 6 caratteri"}</p>
+          )}
          <label className='label'>Password:</label>
          <input className='input' type='password' placeholder='inserisci la tua password' onChange={(e) => setPassword(e.target.value)} value={password}/>
+         {password && (
+            <p className={isPasswordValid ? 'valid' : 'error'}> {isPasswordValid ? "Password ok"  : "Deve contenere almeno 8 caratteri, 1 lettera, 1 numero e 1 simbolo."}</p>
+          )}
 
          <label className='label'>Specializzazione:</label>
          <select className='input' value={specializzazione} onChange={(e) => setSpecializzazione(e.target.value)}>
@@ -75,6 +99,9 @@ function App() {
 
           <label className='label'>Descrizione:</label>
          <textarea className='input' placeholder='inserisci una breve descrizione' onChange={(e) => setDescr(e.target.value)} value={descr}/>
+           {descr && (
+            <p className={isDescrValid ? 'valid' : 'error'}> {isDescrValid ? "Descrizione ok"  : "Deve contenere tra 100 e 1000 caratteri senza spazi iniziali e finali."}</p>
+          )}
 
           <button type='submit'>Invia</button>
       </form>

@@ -22,3 +22,14 @@
   font-size: 1rem;
   user-select: none;
 }
+.error{
+    color: red;
+    font-size: 20px;
+    text-align: center;
+}
+
+.valid{
+color: green;
+    font-size: 20px;
+    text-align: center;
+}
